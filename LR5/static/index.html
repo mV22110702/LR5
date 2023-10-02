@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h1>Cookie Setter</h1>
+
+    <form method="post" onsubmit="handleSubmit(event)">
+        <label for="cookie_value">Cookie key</label>
+        <input required name="key" id="cookie_key" type="text" />
+        <label for="cookie_value">Cookie value</label>
+        <input required name="value" id="cookie_value" type="text" />
+        <label for="cookie_exp_date_time">Cookie expiration date and time</label>
+        <input required name="expDateTime" id="cookie_exp_date_time" type="datetime-local" />
+        <input type="submit" value="Set cookie" />
+    </form>
+    <p id="response"></p>
+    <script>
+const cookieKeyInput = document.getElementById("cookie_key");
+const cookieValueInput = document.getElementById("cookie_value");
+const expDateTimeInput = document.getElementById("cookie_exp_date_time");
+window.addEventListener("load", function () {
+            const now = new Date();
+            const utcString = now.toISOString().substring(0, 19);
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const second = now.getSeconds();
+            const localDatetime = year + "-" +
+                (month < 10 ? "0" + month.toString() : month) + "-" +
+                (day < 10 ? "0" + day.toString() : day) + "T" +
+                (hour < 10 ? "0" + hour.toString() : hour) + ":" +
+                (minute < 10 ? "0" + minute.toString() : minute);
+            expDateTimeInput.min = localDatetime;
+});
+async function handleSubmit(event) {
+            event.preventDefault();
+
+            const cookieKey = cookieKeyInput.value;
+            const cookieValue = cookieValueInput.value;
+            const expDateTime = new Date(expDateTimeInput.value).toISOString();
+            const data = {
+                key: cookieKey,
+                value: cookieValue,
+                expDateTime: expDateTime
+            };
+            console.log(data);
+
+            const responseParagraph = document.getElementById("response");
+
+            let response = null;
+            try {
+                response = await fetch(event.target.action, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+            } catch (error) {
+
+            } finally {
+                if (response) {
+                    responseParagraph.textContent = await response.text();
+                }
+            }
+
+
+
+}
+    </script>
+</body>
+</html>
