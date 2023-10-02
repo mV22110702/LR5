@@ -1,4 +1,4 @@
-using LR5;
+﻿using LR5;
 using LR5.file_logger;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +22,9 @@ app.UseExceptionHandler((app) =>
         var logger = loggerFactory.CreateLogger<ILogger<Program>>();
 
         var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-        var exceptionMessage = exceptionHandlerFeature?.Error.Message ?? "";
+        var exceptionMessage = exceptionHandlerFeature?.Error.Message ??
+            exceptionHandlerFeature?.Error.InnerException?.Message ??
+            "";
 
         logger.LogError(exceptionMessage);
 
@@ -34,19 +36,31 @@ app.UseExceptionHandler((app) =>
 
 app.MapGet("/", async (HttpContext context) =>
 {
-    context.Response.ContentType = Text.Html;
+    context.Response.ContentType = "text/html; charset=utf-8";
     await context.Response.SendFileAsync("./static/index.html");
 });
 
-app.MapGet("/cookies", (HttpContext context, ILogger<Program> logger) =>
+app.MapGet("/cookies", async (HttpContext context, ILogger<Program> logger) =>
 {
-    context.Response.ContentType = Text.Html;
+    context.Response.ContentType = "text/html; charset=utf-8";
     StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.Append("<ol>");
-    var markupListElements = context.Request.Cookies.Select((KeyValuePair) => $"<li>{KeyValuePair.Key}={KeyValuePair.Value}</li>");
-    stringBuilder.Append(String.Join("", markupListElements));
-    stringBuilder.Append("</ol>");
+    stringBuilder.Append("<h1>Your cookies 🍪</h1>");
+    if (context.Request.Cookies.Count != 0)
+    {
+        stringBuilder.Append("<ol>");
+        var markupListElements = context.Request.Cookies.Select((KeyValuePair) => $"<li>{KeyValuePair.Key}={KeyValuePair.Value}</li>");
+        stringBuilder.Append(String.Join("", markupListElements));
+        stringBuilder.Append("</ol>");
+    }
+    else
+    {
+        stringBuilder.Append("<h3>No cookies :(</h3>");
+    }
 
+    context.Response.ContentType = "text/html; charset=utf-8";
+    await context.Response.WriteAsync(stringBuilder.ToString());
+
+    return;
 });
 
 
@@ -63,7 +77,7 @@ app.MapPost("/", async (HttpContext context) =>
         cookieOptions
     );
 
-    context.Response.ContentType = Text.Html;
-    await context.Response.WriteAsync($"Cookie {dto.Key} set to {dto.Value}");
+    context.Response.ContentType = "text/html; charset=utf-8";
+    await context.Response.WriteAsync($"🍪 Cookie \"{dto.Key}\" set to \"{dto.Value}\"");
 });
 app.Run();

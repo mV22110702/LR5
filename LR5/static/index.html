@@ -5,15 +5,18 @@
     <title></title>
 </head>
 <body>
-    <h1>Cookie Setter</h1>
+    <h1>Cookie Setter 🍪</h1>
 
     <form method="post" onsubmit="handleSubmit(event)">
         <label for="cookie_value">Cookie key</label>
         <input required name="key" id="cookie_key" type="text" />
+        </br>
         <label for="cookie_value">Cookie value</label>
         <input required name="value" id="cookie_value" type="text" />
+        </br>
         <label for="cookie_exp_date_time">Cookie expiration date and time</label>
         <input required name="expDateTime" id="cookie_exp_date_time" type="datetime-local" />
+        </br>
         <input type="submit" value="Set cookie" />
     </form>
     <p id="response"></p>
