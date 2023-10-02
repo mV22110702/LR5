@@ -10,23 +10,20 @@ using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Logging.AddFile("./log.txt");
 var app = builder.Build();
-
 app.UseExceptionHandler((app) =>
 {
     app.Run(async (context) =>
     {
-        var loggerFactory = new LoggerFactory();
-        loggerFactory.AddProvider(new FileLoggerProvider("./log.txt"));
-        var logger = loggerFactory.CreateLogger<ILogger<Program>>();
+        var logger = context.RequestServices.GetService<ILogger<Program>>();
 
         var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
         var exceptionMessage = exceptionHandlerFeature?.Error.Message ??
             exceptionHandlerFeature?.Error.InnerException?.Message ??
             "";
 
-        logger.LogError(exceptionMessage);
+        logger?.LogError(exceptionMessage);
 
         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
         await context.Response.WriteAsync(exceptionMessage);
@@ -70,7 +67,6 @@ app.MapPost("/", async (HttpContext context) =>
 
     var cookieOptions = new CookieOptions();
     cookieOptions.Expires = dto.ExpDateTime;
-
     context.Response.Cookies.Append(
         dto.Key,
         dto.Value,
