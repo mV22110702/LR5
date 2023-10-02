@@ -63,7 +63,7 @@ app.MapGet("/cookies", async (HttpContext context, ILogger<Program> logger) =>
 
 app.MapPost("/", async (HttpContext context) =>
 {
-    var dto = await CookieSetterDto.DeserializeJSON(context.Request.Body);
+    var dto = await CookieSetterDto.JsonDeserialize(context.Request.Body);
 
     var cookieOptions = new CookieOptions();
     cookieOptions.Expires = dto.ExpDateTime;

@@ -32,7 +32,7 @@ namespace LR5
             return true;
         }
 
-        public async static Task<CookieSetterDto?> DeserializeJSON(Stream stream)
+        public async static Task<CookieSetterDto?> JsonDeserialize(Stream stream)
         {
             var reader = new StreamReader(stream);
             var jsonPayload = await reader.ReadToEndAsync();
